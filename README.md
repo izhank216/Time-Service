@@ -8,6 +8,12 @@ You can search Bing, personalize your device type, and enjoy a blurred desktop w
 
 THIS APP DOESN'T BELONG TO MICROSOFT OR THIS APP ISN'T MADE BY MICROSOFT
 
+![render](render.png)
+
+
 # LICENSE
 
 MIT
+
+
+
