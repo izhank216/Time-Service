@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Time Service</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      width: 100vw;
+      color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #222;
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+      background-size: cover;
+      background-position: center;
+      backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #bing-search-bar {
+      position: absolute;
+      top: 16px;
+      right: 24px;
+      display: flex;
+      gap: 8px;
+      z-index: 101;
+    }
+    #bing-search-bar input {
+      padding: 0.4em 0.8em;
+      border-radius: 6px;
+      border: none;
+      font-size: 1em;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    #bing-search-bar input:focus {
+      outline: none;
+      box-shadow: none;
+    }
+    #bing-search-bar button {
+      padding: 0.4em 1em;
+      border-radius: 6px;
+      border: none;
+      background: #0078d7;
+      color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #bing-search-bar button:hover {
+      background: #005a9e;
+    }
+    #settings-btn {
+      position: absolute;
+      top: 54px;
+      right: 24px;
+      padding: 0.4em 1em;
+      border-radius: 6px;
+      border: none;
+      background: #222b;
+      color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      cursor: pointer;
+      font-weight: bold;
+      z-index: 101;
+      transition: background 0.2s, transform 0.15s;
+    }
+    #settings-btn:active {
+      transform: scale(0.96);
+    }
+    #about-link {
+      position: absolute;
+      top: 92px;
+      right: 24px;
+      z-index: 101;
+      cursor: pointer;
+      text-decoration: underline;
+      color: #00aaff;
+      font-size: 1em;
+    }
+    #notepad-link {
+      position: absolute;
+      top: 120px;
+      right: 24px;
+      z-index: 101;
+      cursor: pointer;
+      text-decoration: underline;
+      color: #00aaff;
+      font-size: 1em;
+    }
+    #settings-modal {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(30,30,30,0.95);
+      z-index: 998;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-size: 1.2em;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.98);
+      transition: opacity 0.3s cubic-bezier(.6,-0.28,.74,.05), transform 0.3s cubic-bezier(.6,-0.28,.74,.05);
+    }
+    #settings-modal.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+    }
+    #settings-modal .modal-content {
+      background: #222;
+      padding: 2em;
+      border-radius: 12px;
+      box-shadow: 0 0 24px #000a;
+      text-align: center;
+      min-width: 320px;
+      min-height: 100px;
+      transition: transform 0.25s cubic-bezier(.6,-0.28,.74,.05);
+      transform: scale(1);
+    }
+    #settings-modal.hide {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.98);
+      transition: opacity 0.25s cubic-bezier(.6,-0.28,.74,.05), transform 0.25s cubic-bezier(.6,-0.28,.74,.05);
+    }
+    #settings-modal button, #device-choice button {
+      margin: 0.5em;
+      padding: 0.6em 1.5em;
+      font-size: 1em;
+      border-radius: 6px;
+      border: none;
+      background: #00aaff;
+      color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    #settings-modal button:hover, #device-choice button:hover {
+      background: #0088cc;
+    }
+    #animation-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(30,30,30,0.8);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeout 1.4s forwards;
+    }
+    .loader {
+      border: 8px solid #333;
+      border-top: 8px solid #00aaff;
+      border-radius: 50%;
+      width: 64px; height: 64px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    @keyframes fadeout {
+      0% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+    #welcome-animation {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(30,30,30,0.95);
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      animation: none;
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #welcome-animation.hide {
+      animation: welcomeFadeOut 1s forwards;
+    }
+    #welcome-text {
+      font-size: 2.7em;
+      font-weight: bold;
+      color: #00aaff;
+      text-shadow: 0 0 32px #0078d7, 0 0 4px #000;
+      margin-bottom: 0.3em;
+      animation: welcomePopIn 1s cubic-bezier(.6,-0.28,.74,.05);
+    }
+    @keyframes welcomePopIn {
+      0% { opacity: 0; transform: scale(0.7);}
+      80% { opacity: 1; transform: scale(1.1);}
+      100% { opacity: 1; transform: scale(1);}
+    }
+    @keyframes welcomeFadeOut {
+      0% { opacity: 1; }
+      100% { opacity: 0; pointer-events: none;}
+    }
+    #get-started {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(30,30,30,0.95);
+      z-index: 998;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-size: 1.2em;
+    }
+    #get-started label {
+      margin-bottom: 0.5em;
+      font-size: 1.2em;
+    }
+    #get-started input {
+      padding: 0.5em;
+      font-size: 1em;
+      border-radius: 6px;
+      border: none;
+      margin-bottom: 1em;
+      width: 210px;
+      text-align: center;
+    }
+    #get-started button {
+      padding: 0.6em 1.5em;
+      font-size: 1em;
+      border-radius: 6px;
+      border: none;
+      background: #00aaff;
+      color: #fff;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    #get-started button:hover { background: #0088cc;}
+    #device-choice {
+      margin-top: 1.5em;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+    #device-choice label {
+      font-size: 1.1em;
+      margin-bottom: 1em;
+    }
+    #name-display {
+      position: absolute;
+      top: 16px;
+      left: 24px;
+      font-size: 1.1em;
+      opacity: 0.85;
+      text-shadow: 0 0 6px #000;
+      pointer-events: none;
+      z-index: 100;
+    }
+    #system-info {
+      position: absolute;
+      top: 44px;
+      left: 24px;
+      font-size: 0.95em;
+      opacity: 0.8;
+      text-shadow: 0 0 6px #000;
+      z-index: 100;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      pointer-events: none;
+      line-height: 1.6em;
+    }
+    #timer {
+      font-size: 2.5em;
+      text-shadow: 0 0 12px #222;
+      margin-bottom: 0.5em;
+      z-index: 10;
+    }
+    #support-date {
+      position: fixed;
+      right: 24px;
+      bottom: 8px;
+      font-size: 1em;
+      opacity: 0.85;
+      text-shadow: 0 0 6px #000;
+      pointer-events: none;
+      z-index: 10;
+    }
+    #ms-login-container {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 8px;
+      margin: auto;
+      z-index: 2000;
+      text-align: center;
+      max-width: 900px;
+      width: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+    }
+    #ms-login-status {
+      display: inline-block;
+      font-size: 1em;
+      color: #ffb300;
+      background: #222c;
+      border-radius: 8px;
+      padding: 8px 18px;
+      box-shadow: 0 0 12px #0008;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      user-select: text;
+      max-width: 340px;
+      margin-bottom: 6px;
+    }
+    #ms-login-status.signedin {
+      color: #00d97a;
+      background: #222c;
+      cursor: default;
+    }
+    #ms-login-status span {
+      text-decoration: underline;
+      color: #00aaff;
+      cursor: pointer;
+    }
+    #ms-login-status.signedin span {
+      text-decoration: none;
+      color: #00d97a;
+      cursor: default;
+    }
+    #ms-office-icons {
+      display: flex;
+      flex-direction: row;
+      gap: 16px;
+      margin-top: 2px;
+      justify-content: center;
+      align-items: center;
+    }
+    .office-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #222;
+      box-shadow: 0 0 8px #000a;
+      cursor: pointer;
+      transition: transform 0.18s, box-shadow 0.18s;
+      border: none;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .office-icon:hover {
+      transform: scale(1.14);
+      box-shadow: 0 0 20px #00aaff88;
+    }
+  </style>
+</head>
+<body>
+  <div id="welcome-animation" style="display:none;">
+    <div id="welcome-text">Welcome to Time Service!</div>
+  </div>
+  <div id="bing-search-bar">
+    <input type="text" id="bing-query" placeholder="Search Bing..." />
+    <button id="bing-search-btn">Search</button>
+  </div>
+  <button id="settings-btn" style="display:none;">Settings</button>
+  <div id="about-link">About</div>
+  <div id="notepad-link">Notepad</div>
+  <div id="settings-modal">
+    <div class="modal-content" id="settings-modal-content"></div>
+    <button id="settings-close-btn">Close</button>
+  </div>
+  <div id="animation-overlay"><div class="loader"></div></div>
+  <div id="get-started">
+    <label for="username">Enter your name to get started:</label>
+    <input type="text" id="username" placeholder="Your name..." autofocus />
+    <button id="start-btn">Get Started</button>
+    <div id="device-choice">
+      <label>Which device are you on?</label>
+      <div>
+        <button id="choose-laptop">Laptop</button>
+        <button id="choose-pc">PC</button>
+        <button id="choose-skip">Skip for now</button>
+      </div>
+    </div>
+  </div>
+  <div id="name-display"></div>
+  <div id="system-info"></div>
+  <div id="timer"></div>
+  <div id="support-date">Win10 EOL: ...</div>
+  <div id="ms-login-container">
+    <div id="ms-login-status"></div>
+    <div id="ms-office-icons" style="display:none;"></div>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>

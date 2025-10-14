@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>About Time Service App</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      backdrop-filter: blur(20px);
+    }
+    #about-content {
+      background: #222d;
+      padding: 2em 2.5em;
+      border-radius: 16px;
+      min-width: 320px;
+      text-align: center;
+      box-shadow: 0 0 24px #000a;
+    }
+    h1 {
+      margin-bottom: 0.5em;
+      text-decoration: underline;
+    }
+    p {
+      margin-top: 1em;
+      font-size: 1.1em;
+      line-height: 1.7em;
+    }
+    #close-about-btn {
+      margin-top: 2em;
+      padding: 0.6em 1.5em;
+      font-size: 1em;
+      border-radius: 6px;
+      border: none;
+      background: #00aaff;
+      color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    #close-about-btn:hover {
+      background: #0088cc;
+    }
+    #not-ms {
+      margin-top: 2em;
+      color: #ffb300;
+      font-size: 1.07em;
+      font-weight: bold;
+      text-decoration: underline;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div id="about-content">
+    <h1>About Time Service App</h1>
+    <p>
+      Time Service App is a modern Electron-based utility for Windows.<br>
+      It displays your local time, Windows version and performance info, and the Windows 10 End of Support date.<br>
+      You can search Bing, personalize your device type, and enjoy a blurred desktop wallpaper background.<br>
+      <br>
+      © 2025 Time Service Team
+    </p>
+    <div id="not-ms">
+      THIS APP DOESN'T BELONG TO MICROSOFT OR THIS APP ISN'T MADE BY MICROSOFT.
+    </div>
+    <button id="close-about-btn">Close</button>
+  </div>
+  <script>
+    document.getElementById('close-about-btn').onclick = () => {
+      window.close();
+    };
+  </script>
+</body>
+</html>

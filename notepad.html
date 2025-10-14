@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Notepad - Time Service App</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      backdrop-filter: blur(20px);
+    }
+    #notepad-content {
+      background: #222d;
+      padding: 2em 2.5em;
+      border-radius: 16px;
+      min-width: 500px;
+      min-height: 400px;
+      box-shadow: 0 0 24px #000a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      margin-bottom: 1em;
+      text-decoration: underline;
+      font-size: 1.6em;
+    }
+    textarea {
+      width: 100%;
+      min-width: 400px;
+      height: 220px;
+      margin-bottom: 1em;
+      border-radius: 8px;
+      border: none;
+      font-size: 1.15em;
+      padding: 1em;
+      background: #222;
+      color: #fff;
+      resize: vertical;
+      box-shadow: 0 0 8px #0005;
+    }
+    #notepad-actions {
+      display: flex;
+      gap: 1em;
+      margin-top: 0.5em;
+    }
+    #close-notepad-btn, #save-notepad-btn {
+      padding: 0.6em 1.5em;
+      font-size: 1em;
+      border-radius: 6px;
+      border: none;
+      background: #00aaff;
+      color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    #close-notepad-btn:hover, #save-notepad-btn:hover {
+      background: #0088cc;
+    }
+  </style>
+</head>
+<body>
+  <div id="notepad-content">
+    <h1>Notepad</h1>
+    <textarea id="note-area" spellcheck="true" placeholder="Type your notes here..."></textarea>
+    <div id="notepad-actions">
+      <button id="save-notepad-btn">Save</button>
+      <button id="close-notepad-btn">Close</button>
+    </div>
+  </div>
+  <script>
+    // Use @electron/remote for dialog and Node.js fs for saving
+    const { dialog } = require('@electron/remote');
+    const fs = require('fs');
+
+    document.getElementById('close-notepad-btn').onclick = () => {
+      window.close();
+    };
+
+    document.getElementById('save-notepad-btn').onclick = async () => {
+      const text = document.getElementById('note-area').value;
+      const result = await dialog.showSaveDialog({
+        title: "Save Notepad File",
+        defaultPath: "note.txt",
+        filters: [
+          { name: 'Text Files', extensions: ['txt'] },
+          { name: 'All Files', extensions: ['*'] }
+        ]
+      });
+      if (!result.canceled && result.filePath) {
+        fs.writeFile(result.filePath, text, (err) => {
+          if (err) {
+            alert('Error saving file: ' + err.message);
+          } else {
+            alert('File saved successfully!');
+          }
+        });
+      }
+    };
+  </script>
+</body>
+</html>
