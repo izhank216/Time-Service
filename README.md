@@ -8,6 +8,8 @@ You can search Bing, personalize your device type, and enjoy a blurred desktop w
 
 ![Powered by Electron](https://img.shields.io/badge/Powered%20by-Electron-47848F?logo=electron&logoColor=white) 
 ![Powered by Node.js](https://img.shields.io/badge/Powered%20by-Node.js-43853D?logo=node.js&logoColor=white)
+![For Windows](https://img.shields.io/badge/Platform-Windows-blue)
+
 
 THIS APP DOESN'T BELONG TO MICROSOFT OR THIS APP ISN'T MADE BY MICROSOFT
 
