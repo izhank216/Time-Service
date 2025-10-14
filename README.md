@@ -6,6 +6,9 @@ You can search Bing, personalize your device type, and enjoy a blurred desktop w
 
 © 2025 Time Service Team
 
+![Powered by Electron](https://img.shields.io/badge/Powered%20by-Electron-47848F?logo=electron&logoColor=white) 
+![Powered by Node.js](https://img.shields.io/badge/Powered%20by-Node.js-43853D?logo=node.js&logoColor=white)
+
 THIS APP DOESN'T BELONG TO MICROSOFT OR THIS APP ISN'T MADE BY MICROSOFT
 
 ![render](render.png)
