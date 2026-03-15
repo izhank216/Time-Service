@@ -3,6 +3,7 @@ const path = require('path');
 const https = require('https');
 const { execSync } = require('child_process');
 const os = require('os');
+const { loadPlugins } = require('./pluginLoader');
 
 // Enable @electron/remote
 require('@electron/remote/main').initialize();
@@ -98,6 +99,7 @@ function createWindow() {
     win.webContents.send('desktop-wallpaper', getDesktopWallpaper());
     win.webContents.send('windows-version', getWindowsVersionInfo());
     win.webContents.send('performance-info', getPerformanceInfo());
+    loadPlugins(win);
   });
 }
 
