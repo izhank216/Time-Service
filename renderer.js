@@ -1,5 +1,53 @@
 const { ipcRenderer, shell } = require('electron');
 const remote = require('@electron/remote');
+const RPC = require('discord-rpc');
+let rpcClient = null;
+const clientId = '1482732065425326172'; 
+let isRpcEnabled = localStorage.getItem('discord_rpc_enabled') === 'true';
+
+async function initDiscordRPC() {
+    if (rpcClient) return;
+    rpcClient = new RPC.Client({ transport: 'ipc' });
+    rpcClient.on('ready', () => {
+        rpcClient.setActivity({
+            details: 'Managing Time',
+            state: 'Using Time Service App',
+            startTimestamp: new Date(),
+            largeImageKey: 'logo',
+            largeImageText: 'Time Service',
+            instance: false,
+        }).catch(() => console.error(`save failed`));
+    });
+    try { await rpcClient.login({ clientId }); } catch (err) { rpcClient = null; }
+}
+
+async function shutdownDiscordRPC() {
+    if (rpcClient) {
+        await rpcClient.destroy();
+        rpcClient = null;
+    }
+}
+
+const discordLink = document.getElementById('discord-rpc-link');
+if (isRpcEnabled) {
+    discordLink.textContent = 'Disable Discord RPC';
+    initDiscordRPC();
+}
+
+if (discordLink) {
+    discordLink.onclick = async () => {
+        if (isRpcEnabled) {
+            await shutdownDiscordRPC();
+            isRpcEnabled = false;
+            discordLink.textContent = 'Enable Discord RPC';
+        } else {
+            await initDiscordRPC();
+            isRpcEnabled = true;
+            discordLink.textContent = 'Disable Discord RPC';
+        }
+        localStorage.setItem('discord_rpc_enabled', isRpcEnabled);
+    };
+}
 
 function updateTime() {
   const now = new Date();
