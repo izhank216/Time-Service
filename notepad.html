@@ -17,38 +17,39 @@
     }
     #notepad-content {
       background: #222d;
-      padding: 2em 2.5em;
+      padding: 2em;
       border-radius: 16px;
-      min-width: 500px;
-      min-height: 400px;
+      width: 80%;
+      max-width: 800px;
       box-shadow: 0 0 24px #000a;
       display: flex;
       flex-direction: column;
-      align-items: center;
     }
     h1 {
-      margin-bottom: 1em;
+      margin: 0 0 0.5em 0;
       text-decoration: underline;
       font-size: 1.6em;
+      text-align: center;
     }
-    textarea {
-      width: 100%;
-      min-width: 400px;
-      height: 220px;
-      margin-bottom: 1em;
+    .editor-wrapper {
+      position: relative;
+      background: #111;
       border-radius: 8px;
-      border: none;
-      font-size: 1.15em;
-      padding: 1em;
-      background: #222;
-      color: #fff;
-      resize: vertical;
-      box-shadow: 0 0 8px #0005;
+      border: 1px solid #444;
+      margin-bottom: 1em;
+    }
+    .editor-input {
+      min-height: 300px;
+      padding: 15px;
+      color: #eee;
+      outline: none;
+      font-size: 1.1em;
+      overflow-y: auto;
     }
     #notepad-actions {
       display: flex;
       gap: 1em;
-      margin-top: 0.5em;
+      justify-content: center;
     }
     #close-notepad-btn, #save-notepad-btn {
       padding: 0.6em 1.5em;
@@ -57,7 +58,6 @@
       border: none;
       background: #00aaff;
       color: #fff;
-      font-family: 'Segoe UI', Arial, sans-serif;
       cursor: pointer;
       font-weight: bold;
       transition: background 0.2s;
@@ -68,37 +68,62 @@
   </style>
 </head>
 <body>
+
   <div id="notepad-content">
     <h1>Notepad</h1>
-    <textarea id="note-area" spellcheck="true" placeholder="Type your notes here..."></textarea>
+    <div class="editor-wrapper">
+      <div id="lexical-editor" class="editor-input" contenteditable="true"></div>
+    </div>
     <div id="notepad-actions">
       <button id="save-notepad-btn">Save</button>
       <button id="close-notepad-btn">Close</button>
     </div>
   </div>
+
   <script>
-    // Use @electron/remote for dialog and Node.js fs for saving
     const { dialog } = require('@electron/remote');
     const fs = require('fs');
+    const { createEditor, $getRoot } = require('lexical');
+
+    const editorElement = document.getElementById('lexical-editor');
+    
+    const editor = createEditor({
+      namespace: 'TimeServiceNotepad',
+      onError: (error) => console.error(error)
+    });
+
+    editor.setRootElement(editorElement);
+
+    editor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => {
+        const root = $getRoot();
+        const text = root.getTextContent();
+      });
+    });
 
     document.getElementById('close-notepad-btn').onclick = () => {
       window.close();
     };
 
     document.getElementById('save-notepad-btn').onclick = async () => {
-      const text = document.getElementById('note-area').value;
+      let textContent = "";
+      editor.getEditorState().read(() => {
+        textContent = $getRoot().getTextContent();
+      });
+
       const result = await dialog.showSaveDialog({
-        title: "Save Notepad File",
-        defaultPath: "note.txt",
+        title: "Save Note",
+        defaultPath: "",
         filters: [
           { name: 'Text Files', extensions: ['txt'] },
           { name: 'All Files', extensions: ['*'] }
         ]
       });
+
       if (!result.canceled && result.filePath) {
-        fs.writeFile(result.filePath, text, (err) => {
+        fs.writeFile(result.filePath, textContent, (err) => {
           if (err) {
-            alert('Error saving file: ' + err.message);
+            console.error(`save failed`);
           } else {
             alert('File saved successfully!');
           }
